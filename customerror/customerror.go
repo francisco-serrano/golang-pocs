@@ -41,6 +41,5 @@ func Foo() error {
 
 func Run() {
 	err := Foo()
-	fmt.Println(err)        // <nil>
+	fmt.Println(err) // <nil>
 }
-

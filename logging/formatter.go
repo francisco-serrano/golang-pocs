@@ -8,8 +8,6 @@ import (
 	"os"
 )
 
-
-
 func Run() {
 	logger := &logrus.Logger{
 		Out:   os.Stdout,

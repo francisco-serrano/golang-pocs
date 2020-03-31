@@ -7,7 +7,7 @@ import (
 )
 
 type MyConfig struct {
-	SampleVar  int `env:"SAMPLE_VAR" env-default:"000" env-description:"sample var description" env-upd:""`
+	SampleVar  int    `env:"SAMPLE_VAR" env-default:"000" env-description:"sample var description" env-upd:""`
 	AnotherVar string `env:"ANOTHER_VAR" env-default:"999" env-description:"another var description" env-upd:""`
 }
 
