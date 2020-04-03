@@ -1,18 +1,18 @@
 package main
 
-import "github.com/francisco-serrano/awesomeProject/context"
+import "github.com/francisco-serrano/awesomeProject/database"
 
 func main() {
 	//customerror.Run()
 	//enums.Run()
 	//runes.Run()
 	//shift.Run()
-	//database.Run()
+	database.Run()
 	//logging.Run()
 	//database.RunPid()
 	//environment.Run()
 	//memory.Run()
 	//functional.Run()
 	//dynamicjson.Run()
-	context.Run()
+	//context.Run()
 }

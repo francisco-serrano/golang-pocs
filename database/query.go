@@ -44,5 +44,11 @@ func run() {
 		panic(err)
 	}
 
+	if err := db.Transaction(func(tx *gorm.DB) error {
+		return tx.Where(`status in (?) AND who != ''`, statusArr).Find(&jobs).Error
+	}); err != nil {
+		panic(err)
+	}
+
 	fmt.Println(len(jobs))
 }
