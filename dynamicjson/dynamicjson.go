@@ -6,12 +6,12 @@ import (
 )
 
 type DynamicStructure struct {
-	Filters []FilterParams `json:"filters"`
+	Filters []FilterParams `jsonsample:"filters"`
 }
 
 type FilterParams struct {
-	Key   string      `json:"key"`
-	Value interface{} `json:"value"`
+	Key   string      `jsonsample:"key"`
+	Value interface{} `jsonsample:"value"`
 }
 
 func Run() {
