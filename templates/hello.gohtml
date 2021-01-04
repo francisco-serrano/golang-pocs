@@ -1,0 +1,36 @@
+{{define "footer"}}
+    <footer>
+        <p>
+            Copyright 2020 Francisco Serrano
+        </p>
+        <p>
+            Contact Information: <a href="mailto:francisco.serrano372@gmail.com">francisco.serrano372@gmail.com</a>.
+        </p>
+    </footer>
+{{end}}
+
+{{define "widget"}}
+    <h3 class="name">
+        {{template "widget-header" .Name}}
+        <span class="price">${{.Price}}</span>
+    </h3>
+{{end}}
+
+{{define "widget-header"}}
+    <h3 class="name">{{.}}</h3>
+{{end}}
+
+<h1>
+    Hello,
+    {{if .Name}}
+        {{.Name}}
+    {{- else}}
+        there
+    {{- end}}!
+</h1>
+
+{{range .Widgets}}
+    {{template "widget" .}}
+{{end}}
+
+{{template "footer"}}

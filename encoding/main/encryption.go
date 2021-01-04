@@ -4,16 +4,23 @@ import (
 	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
-	"crypto/hmac"
 	"crypto/sha256"
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
 	"io"
 	"log"
 	"net/http"
 	"os"
-	"strings"
+	"time"
 )
+
+type myClaims struct {
+	jwt.StandardClaims
+	Email string
+}
+
+const myKey = "my-key"
 
 func Run() {
 	msg := "hello world"
@@ -97,25 +104,24 @@ func foo(w http.ResponseWriter, r *http.Request) {
 		c = &http.Cookie{}
 	}
 
-	isEqual := true
-	xs := strings.SplitN(c.Value, "|", 2)
-	if len(xs) == 2 {
-		cCode := xs[0]
-		cEmail := xs[1]
-
-		code, err := getCode(cEmail)
-		if err != nil {
-			log.Print("error while getting code", err)
-			http.Redirect(w, r, "/", http.StatusSeeOther)
-			return
+	signedToken := c.Value
+	parsedToken, err := jwt.ParseWithClaims(signedToken, &myClaims{}, func(t *jwt.Token) (interface{}, error) {
+		if t.Method.Alg() == jwt.SigningMethodHS256.Alg() {
+			return nil, fmt.Errorf("someone tried to hack: changed sining method")
 		}
 
-		isEqual = hmac.Equal([]byte(cCode), []byte(code))
-	}
+		return []byte(myKey), nil
+	})
+
+	isEqual := err == nil && parsedToken.Valid
 
 	message := "not logged in"
 	if isEqual {
 		message = "logged in"
+
+		claims := parsedToken.Claims.(*myClaims)
+		fmt.Println(claims.Email)
+		fmt.Println(claims.ExpiresAt)
 	}
 
 	html := `
@@ -152,17 +158,16 @@ func bar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	code, err := getCode(email)
+	token, err := getJWT(email)
 	if err != nil {
-		log.Print("error while getting code", err)
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Error(w, fmt.Errorf("could not get JWT %w", err).Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// hash / message digest / digest / hash value | "what we stored"
 	c := &http.Cookie{
 		Name:  "session",
-		Value: code + "|" + email,
+		Value: token,
 	}
 
 	http.SetCookie(w, c)
@@ -170,13 +175,22 @@ func bar(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-func getCode(data string) (string, error) {
-	h := hmac.New(sha256.New, []byte("mykeyA"))
-	if _, err := io.WriteString(h, data); err != nil {
-		return "", fmt.Errorf("error while writing string %w", err)
+func getJWT(msg string) (string, error) {
+	claims := &myClaims{
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(5 * time.Minute).Unix(),
+		},
+		Email: msg,
 	}
 
-	return fmt.Sprintf("%x", h.Sum(nil)), nil
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	signedToken, err := token.SignedString([]byte(myKey))
+	if err != nil {
+		return "", fmt.Errorf("error while signing JWT %w", err)
+	}
+
+	return signedToken, nil
 }
 
 func enDecode(key []byte, input string) ([]byte, error) {
@@ -220,4 +234,8 @@ func encryptWriter(w io.Writer, key []byte) (io.Writer, error) {
 		S: s,
 		W: w,
 	}, nil
+}
+
+func main() {
+	RunWithHMAC()
 }
