@@ -95,4 +95,5 @@ func completeGithubOauth(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// login to account userID using JWT
+	fmt.Println(userID)
 }
