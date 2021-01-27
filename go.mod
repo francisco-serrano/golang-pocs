@@ -12,6 +12,9 @@ require (
 	github.com/jinzhu/gorm v1.9.12
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/sirupsen/logrus v1.4.2
+	github.com/spf13/cobra v1.1.1 // indirect
+	github.com/spf13/pflag v1.0.5
+	github.com/spf13/viper v1.7.1
 	github.com/t-tomalak/logrus-easy-formatter v0.0.0-20190827215021-c074f06c5816
 	github.com/thanhpk/randstr v1.0.4
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9

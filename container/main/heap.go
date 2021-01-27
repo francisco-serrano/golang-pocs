@@ -3,6 +3,9 @@ package main
 import (
 	"container/heap"
 	"fmt"
+	"os"
+	"path"
+	"strings"
 )
 
 type heapFloat32 []float32
@@ -52,4 +55,15 @@ func main() {
 	heap.Init(myHeap)
 
 	fmt.Printf("%v\n", myHeap)
+
+	a := []int{1, 2, 3, 4, 5, 6}
+
+	fmt.Println(a)
+	fmt.Println(a[:len(a)-1])
+
+	cwd, _ := os.Getwd()
+
+	fmt.Println(strings.Split(cwd, string(os.PathSeparator)))
+
+	fmt.Println(path.Join(cwd, "../../"))
 }
