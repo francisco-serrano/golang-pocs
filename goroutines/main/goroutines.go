@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"runtime"
 	"sync"
 	"time"
 )
@@ -91,8 +92,28 @@ func f3(out <-chan int, in chan<- int) {
 	in <- x
 }
 
+func exampleD() {
+	var i byte
+	fmt.Println(i)
+	fmt.Println(i+1)
+	go func() {
+		for i := 0; i < 255; i++ {
+
+		}
+		fmt.Println("AAAA")
+	}()
+
+	fmt.Println("Leaving goroutine!")
+
+	runtime.Gosched()
+	runtime.GC()
+
+	fmt.Println("Good bye!")
+}
+
 func main() {
 	//exampleA()
 	//exampleB()
-	exampleC()
+	//exampleC()
+	exampleD()
 }
