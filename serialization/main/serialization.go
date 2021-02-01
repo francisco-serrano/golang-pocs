@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"encoding/gob"
 	"fmt"
+	"html/template"
+	"net/http"
 	"os"
 	"strings"
 )
@@ -116,11 +118,95 @@ func Print() {
 	}
 }
 
-func main() {
-	if err := load(); err != nil {
-		fmt.Println(err)
+func homepage(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Serving", r.Host, "for", r.URL.Path)
+
+	t := template.Must(template.ParseGlob("home.gohtml"))
+	t.ExecuteTemplate(w, "home.gohtml", nil)
+}
+
+func listAll(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Listing the contents of the KV store!")
+
+	fmt.Fprintf(w, `<a href="/" style="margin-right: 20px;">Home sweet home!</a>`)
+	fmt.Fprintf(w, `<a href="/list" style="margin-right: 20px;">List all elements!</a>`)
+	fmt.Fprintf(w, `<a href="/change" style="margin-right: 20px;">Change an element!</a>`)
+	fmt.Fprintf(w, `<a href="/insert" style="margin-right: 20px;">Insert new element!</a>`)
+
+	fmt.Fprintf(w, `<h1>The contents of the KV store are:</h1>`)
+
+	fmt.Fprintf(w, `<ul>`)
+
+	for k, v := range DATA {
+		fmt.Fprintf(w, `<li>`)
+		fmt.Fprintf(w, `<strong>%s</strong> with value: %v`, k, v)
+		fmt.Fprintf(w, `</li>`)
 	}
 
+	fmt.Fprintf(w, `</ul>`)
+}
+
+func changeElement(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Changing an element of the KV store!")
+
+	t := template.Must(template.ParseFiles("update.gohtml"))
+	if r.Method != http.MethodPost {
+		t.Execute(w, nil)
+		return
+	}
+
+	key := r.FormValue("key")
+	n := myElement{
+		Name:    r.FormValue("name"),
+		Surname: r.FormValue("surname"),
+		ID:      r.FormValue("id"),
+	}
+
+	if !Change(key, n) {
+		fmt.Println("Update operation failed!")
+	} else {
+		if err := save(); err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		t.Execute(w, struct {
+			Success bool
+		}{true})
+	}
+}
+
+func insertElement(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Inserting an element to the KV store!")
+	t := template.Must(template.ParseFiles("insert.gohtml"))
+	if r.Method != http.MethodPost {
+		t.Execute(w, nil)
+		return
+	}
+
+	key := r.FormValue("key")
+	n := myElement{
+		Name:    r.FormValue("name"),
+		Surname: r.FormValue("surname"),
+		ID:      r.FormValue("id"),
+	}
+
+	if !Add(key, n) {
+		fmt.Println("Add operation failed!")
+		return
+	}
+
+	if err := save(); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	t.Execute(w, struct {
+		Success bool
+	}{true})
+}
+
+func cliOperation() {
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		text := scanner.Text()
@@ -177,4 +263,24 @@ func main() {
 			fmt.Println("Unknown command - please try again!")
 		}
 	}
+}
+
+func webserverOperation() {
+	http.HandleFunc("/", homepage)
+	http.HandleFunc("/change", changeElement)
+	http.HandleFunc("/list", listAll)
+	http.HandleFunc("/insert", insertElement)
+
+	if err := http.ListenAndServe(":8080", nil); err != nil {
+		fmt.Println(err)
+	}
+}
+
+func main() {
+	if err := load(); err != nil {
+		fmt.Println(err)
+	}
+
+	//cliOperation()
+	webserverOperation()
 }
