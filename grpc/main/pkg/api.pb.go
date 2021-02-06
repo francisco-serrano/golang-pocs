@@ -171,12 +171,12 @@ func file_api_proto_rawDescGZIP() []byte {
 
 var file_api_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_api_proto_goTypes = []interface{}{
-	(*Request)(nil),  // 0: main.Request
-	(*Response)(nil), // 1: main.Response
+	(*Request)(nil),  // 0: kv.Request
+	(*Response)(nil), // 1: kv.Response
 }
 var file_api_proto_depIdxs = []int32{
-	0, // 0: main.MessageService.SayIt:input_type -> main.Request
-	1, // 1: main.MessageService.SayIt:output_type -> main.Response
+	0, // 0: kv.MessageService.SayIt:input_type -> kv.Request
+	1, // 1: kv.MessageService.SayIt:output_type -> kv.Response
 	1, // [1:2] is the sub-list for method output_type
 	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -260,7 +260,7 @@ func NewMessageServiceClient(cc grpc.ClientConnInterface) MessageServiceClient {
 
 func (c *messageServiceClient) SayIt(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
 	out := new(Response)
-	err := c.cc.Invoke(ctx, "/main.MessageService/SayIt", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/kv.MessageService/SayIt", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -294,7 +294,7 @@ func _MessageService_SayIt_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/main.MessageService/SayIt",
+		FullMethod: "/kv.MessageService/SayIt",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MessageServiceServer).SayIt(ctx, req.(*Request))
@@ -303,7 +303,7 @@ func _MessageService_SayIt_Handler(srv interface{}, ctx context.Context, dec fun
 }
 
 var _MessageService_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "main.MessageService",
+	ServiceName: "kv.MessageService",
 	HandlerType: (*MessageServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

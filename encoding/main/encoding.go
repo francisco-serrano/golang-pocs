@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-//func main() {
+//func kv() {
 //	//msg := "hello world"
 //	//
 //	//encoded := encode(msg)

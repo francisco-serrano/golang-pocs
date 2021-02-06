@@ -38,7 +38,7 @@ func main() {
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
-	file, err := ioutil.ReadFile("./oauth/main/sample.html")
+	file, err := ioutil.ReadFile("./oauth/kv/sample.html")
 	if err != nil {
 		log.Fatal(err)
 	}
